@@ -42,16 +42,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <!-- jQuery CDN -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-KyZXEAg3QhqLMpG8r+Knujsl5+5hb7V7z7dRh3SoGfs=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
 
     <!-- DataTables CSS CDN -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.1.2/css/dataTables.dataTables.min.css">
 
     <!-- DataTables JS CDN -->
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/2.1.2/js/dataTables.min.js"></script>
 </head>
 
 <body>
+    <!-- EDIT modal -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#EditModal">
+    Edit Modal
+    </button>
+
+    <!-- EDIT Modal -->
+    <div class="modal fade" id="EditModal" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="EditModalLabel">Modal title</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">PHP CRUD</a>
@@ -101,8 +124,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <button type="submit" class="btn btn-primary">Add Note</button>
         </form>
     </div>
-    <div class="container">
+    <div class="container my-4">
         <table class="table" id="myTable">
+            <hr>
             <thead>
                 <tr>
                     <th scope="col">S.No</th>
@@ -115,12 +139,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <?php
                 $sql = "SELECT * FROM `crud`";
                 $result = mysqli_query($conn, $sql);
+                $SNo = 0;
                 while ($row = mysqli_fetch_assoc($result)) {
+                    $SNo = $SNo + 1;
                     echo "<tr>
-                    <th scope='row'>" . $row['S.No.'] . "</th>
+                    <th scope='row'>" . $SNo . "</th>
                     <td>" . $row['Title'] . "</td>
                     <td>" . $row['Description'] . "</td>
-                    <td> Actions </td>
+                    <td> <a href='/Edit'>Edit</a>  <a href='/Delete'>Delete</a> </td>
                 </tr>";
                 }
                 ?>
