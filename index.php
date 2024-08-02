@@ -53,9 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body>
     <!-- EDIT modal -->
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#EditModal">
+    <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#EditModal">
     Edit Modal
-    </button>
+    </button> -->
 
     <!-- EDIT Modal -->
     <div class="modal fade" id="EditModal" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true">
@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <th scope='row'>" . $SNo . "</th>
                     <td>" . $row['Title'] . "</td>
                     <td>" . $row['Description'] . "</td>
-                    <td> <a href='/Edit'>Edit</a>  <a href='/Delete'>Delete</a> </td>
+                    <td> <button class='Edit btn btn-sm btn-primary'>Edit</button>  <a href='/Delete'>Delete</a> </td>
                 </tr>";
                 }
                 ?>
@@ -159,11 +159,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $('#myTable').DataTable();
         });
     </script>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const edits = document.getElementsByClassName('Edit');
+            Array.from(edits).forEach((element) => {
+                element.addEventListener("click", (e) => {
+                    console.log("Edit", );
+                    tr = e.target.parentNode.parentNode;
+                    Title = tr.getElementsByTagName("td")[0].innerText;
+                    Description = tr.getElementsByTagName("td")[1].innerText;
+                    console.log(Title, Description);
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
