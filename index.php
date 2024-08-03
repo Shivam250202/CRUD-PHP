@@ -15,19 +15,38 @@ if (!$conn) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $Title = mysqli_real_escape_string($conn, $_POST["Title"]);
-    $Description = mysqli_real_escape_string($conn, $_POST["Description"]);
+if (isset($_POST['SNoEdit'])) {
+        // Update the Record
+        $SNo = mysqli_real_escape_string($conn, $_POST["SNoEdit"]);
+        $Title = mysqli_real_escape_string($conn, $_POST["TitleEdit"]);
+        $Description = mysqli_real_escape_string($conn, $_POST["DescriptionEdit"]);
 
-    // SQL query to be executed
-    $sql = "INSERT INTO `crud` (`Title`, `Description`) VALUES ('$Title', '$Description')";
-    $result = mysqli_query($conn, $sql);
+        // SQL query to be executed
+        $sql = "UPDATE `crud` SET `Title` = $Title , `Description` WHERE `crud`.`SNo` = $SNo";
+        $result = mysqli_query($conn, $sql);
+        
+        if ($result){
+            echo "We Updated The Record Successfully";
+        }
+        else{
+            echo "We Could not Updated The Record Successfully";
+        }
+    } 
+else {
+        $Title = mysqli_real_escape_string($conn, $_POST["Title"]);
+        $Description = mysqli_real_escape_string($conn, $_POST["Description"]);
 
-    // Add new trip to the Trip table in the database
-    if ($result) {
-        // echo "The record has been Inserted successfully<br>";
-        $insert = true;
-    } else {
-        echo "The record was not inserted successfully because of this error ----> " . mysqli_error($conn);
+        // SQL query to be executed
+        $sql = "INSERT INTO `crud` (`Title`, `Description`) VALUES ('$Title', '$Description')";
+        $result = mysqli_query($conn, $sql);
+
+        // Add new trip to the Trip table in the database
+        if ($result) {
+            // echo "The record has been Inserted successfully<br>";
+            $insert = true;
+        } else {
+            echo "The record was not inserted successfully because of this error ----> " . mysqli_error($conn);
+        }
     }
 }
 ?>
@@ -67,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <div class="modal-body">
                     <form action="/CRUD PHP/index.php" method="post">
-                        <input type="hidden" name="S.NoEdit" id="S.NoEdit">
+                        <input type="hidden" name="SNoEdit" id="SNoEdit">
                         <div class="mb-3">
                             <label for="Title" class="form-label">Note Title</label>
                             <input type="text" class="form-control" id="TitleEdit" name="TitleEdit">
@@ -157,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <th scope='row'>" . $SNo . "</th>
                     <td>" . $row['Title'] . "</td>
                     <td>" . $row['Description'] . "</td>
-                    <td> <button class='Edit btn btn-sm btn-primary'>Edit</button>  <a href='/Delete'>Delete</a> </td>
+                    <td> <button class='Edit btn btn-sm btn-primary' id = " . $row['SNo'] . " >Edit</button>  <a href='/Delete'>Delete</a> </td>
                 </tr>";
                 }
                 ?>
@@ -185,6 +204,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     console.log(Title, Description);
                     TitleEdit.value = Title;
                     DescriptionEdit.value = Description;
+                    SNoEdit.value = e.target.id;
+                    console.log(e.target.id)
                     $('#EditModal').modal('toggle');
                 });
             });
