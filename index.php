@@ -22,7 +22,7 @@ if (isset($_POST['SNoEdit'])) {
         $Description = mysqli_real_escape_string($conn, $_POST["DescriptionEdit"]);
 
         // SQL query to be executed
-        $sql = "UPDATE `crud` SET `Title` = $Title , `Description` WHERE `crud`.`SNo` = $SNo";
+        $sql = "UPDATE `crud` SET `Title` = $Title , `Description` = '$Description' WHERE `crud`.`SNo` = $SNo";
         $result = mysqli_query($conn, $sql);
         
         if ($result){
