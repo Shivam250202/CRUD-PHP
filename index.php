@@ -1,6 +1,10 @@
 <?php
-/* Connect to the database */
 $insert = false;
+$update = false;
+$updateError = false;
+$delete = false;
+$deleteError = false;
+
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -15,24 +19,24 @@ if (!$conn) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-if (isset($_POST['SNoEdit'])) {
+    if (isset($_POST['SNoEdit'])) {
         // Update the Record
         $SNo = mysqli_real_escape_string($conn, $_POST["SNoEdit"]);
         $Title = mysqli_real_escape_string($conn, $_POST["TitleEdit"]);
         $Description = mysqli_real_escape_string($conn, $_POST["DescriptionEdit"]);
 
         // SQL query to be executed
-        $sql = "UPDATE `crud` SET `Title` = $Title , `Description` = '$Description' WHERE `crud`.`SNo` = $SNo";
+        $sql = "UPDATE `crud` SET `Title` = '$Title' , `Description` = '$Description' WHERE `crud`.`SNo` = $SNo";
         $result = mysqli_query($conn, $sql);
-        
-        if ($result){
-            echo "We Updated The Record Successfully";
+
+        // Debugging output
+        if ($result) {
+            $update = true;
+        } else {
+            $updateError = true;
+            echo "Error updating record: " . mysqli_error($conn);
         }
-        else{
-            echo "We Could not Updated The Record Successfully";
-        }
-    } 
-else {
+    } else {
         $Title = mysqli_real_escape_string($conn, $_POST["Title"]);
         $Description = mysqli_real_escape_string($conn, $_POST["Description"]);
 
@@ -40,13 +44,27 @@ else {
         $sql = "INSERT INTO `crud` (`Title`, `Description`) VALUES ('$Title', '$Description')";
         $result = mysqli_query($conn, $sql);
 
-        // Add new trip to the Trip table in the database
         if ($result) {
-            // echo "The record has been Inserted successfully<br>";
             $insert = true;
         } else {
             echo "The record was not inserted successfully because of this error ----> " . mysqli_error($conn);
         }
+    }
+}
+
+if (isset($_GET['delete'])) {
+    $SNo = $_GET['delete'];
+
+    // SQL query to be executed
+    $sql = "DELETE FROM `crud` WHERE `crud`.`SNo` = $SNo";
+    $result = mysqli_query($conn, $sql);
+
+    // Debugging output
+    if ($result) {
+        $delete = true;
+    } else {
+        $deleteError = true;
+        echo "Error deleting record: " . mysqli_error($conn);
     }
 }
 ?>
@@ -76,10 +94,37 @@ else {
     Edit Modal
     </button> -->
 
+    <?php
+    if ($update) {
+        echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
+        <strong>Success!</strong> Your note has been updated successfully.
+        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+      </div>";
+    }
+    if ($updateError) {
+        echo "<div class='alert alert-warning alert-dismissible fade show' role='alert'>
+        <strong>Oops Error!</strong> You should check in on some of those fields below.
+        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+      </div>";
+    }
+    if ($delete) {
+        echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
+        <strong>Success!</strong> Your note has been deleted successfully.
+        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+      </div>";
+    }
+    if ($deleteError) {
+        echo "<div class='alert alert-warning alert-dismissible fade show' role='alert'>
+        <strong>Oops Error!</strong> There was an error deleting the note.
+        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+      </div>";
+    }
+    ?>
+
     <!-- EDIT Modal -->
     <div class="modal fade" id="EditModal" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">Edit
+            <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="EditModalLabel"> Edit this Note</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -100,7 +145,6 @@ else {
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
                 </div>
             </div>
         </div>
@@ -171,12 +215,15 @@ else {
                 $result = mysqli_query($conn, $sql);
                 $SNo = 0;
                 while ($row = mysqli_fetch_assoc($result)) {
-                    $SNo = $SNo + 1;
+                    $SNo++;
                     echo "<tr>
                     <th scope='row'>" . $SNo . "</th>
-                    <td>" . $row['Title'] . "</td>
-                    <td>" . $row['Description'] . "</td>
-                    <td> <button class='Edit btn btn-sm btn-primary' id = " . $row['SNo'] . " >Edit</button>  <a href='/Delete'>Delete</a> </td>
+                    <td>" . htmlspecialchars($row['Title']) . "</td>
+                    <td>" . htmlspecialchars($row['Description']) . "</td>
+                    <td> 
+                        <button class='Edit btn btn-sm btn-primary' id=" . $row['SNo'] . " >Edit</button>  
+                        <button class='Delete btn btn-sm btn-danger' id=d" . $row['SNo'] . " >Delete</button>
+                    </td>
                 </tr>";
                 }
                 ?>
@@ -188,11 +235,7 @@ else {
         $(document).ready(function() {
             $('#myTable').DataTable();
         });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
-    <script>
+
         document.addEventListener("DOMContentLoaded", () => {
             const edits = document.getElementsByClassName('Edit');
             Array.from(edits).forEach((element) => {
@@ -205,12 +248,25 @@ else {
                     TitleEdit.value = Title;
                     DescriptionEdit.value = Description;
                     SNoEdit.value = e.target.id;
-                    console.log(e.target.id)
+                    console.log(e.target.id);
                     $('#EditModal').modal('toggle');
+                });
+            });
+
+            const deletes = document.getElementsByClassName('Delete');
+            Array.from(deletes).forEach((element) => {
+                element.addEventListener("click", (e) => {
+                    const SNo = e.target.id.substr(1);
+                    if (confirm("Are you sure you want to delete this note?")) {
+                        window.location = `/CRUD PHP/index.php?delete=${SNo}`;
+                    }
                 });
             });
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
 </body>
 
 </html>
