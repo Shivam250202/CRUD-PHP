@@ -221,8 +221,7 @@ if (isset($_GET['delete'])) {
                     <td>" . htmlspecialchars($row['Title']) . "</td>
                     <td>" . htmlspecialchars($row['Description']) . "</td>
                     <td> 
-                        <button class='Edit btn btn-sm btn-primary' id=" . $row['SNo'] . " >Edit</button>  
-                        <button class='Delete btn btn-sm btn-danger' id=d" . $row['SNo'] . " >Delete</button>
+                        <button class='Edit btn btn-sm btn-primary' id=" . $row['SNo'] . " >Edit</button><button class='Delete btn btn-sm btn-danger' id=d" . $row['SNo'] . " >Delete</button>
                     </td>
                 </tr>";
                 }
